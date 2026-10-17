@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alstom Care</title>
+<style>
+:root{--bg:#eef2f7;--pn:#fff;--ink:#0b2a4a;--mu:#5b6f86;--ln:#d5deea;--ac:#1a73c9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1829;--pn:#10243b;--ink:#e8f0f8;--mu:#9bb0c6;--ln:#24405e;--ac:#5aa9f0}}
+:root[data-theme="dark"]{--bg:#0a1829;--pn:#10243b;--ink:#e8f0f8;--mu:#9bb0c6;--ln:#24405e;--ac:#5aa9f0}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Helvetica,Arial,sans-serif}
+#login{height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b2a4a,#1a5a9c);padding:16px}
+.card{background:#fff;color:#0b2a4a;border-radius:6px;padding:36px 32px;width:100%;max-width:380px}
+.logo{font-size:26px;font-weight:800;letter-spacing:.04em;margin:0}.logo span{color:#1a73c9;font-weight:400}
+.card p{color:#5b6f86;margin:6px 0 20px}label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+input[type=email],input[type=password]{width:100%;padding:11px 12px;border:1px solid #c5d2e2;border-radius:4px;font-size:15px}
+:focus-visible{outline:2px solid #1a73c9;outline-offset:1px}
+.go{width:100%;margin-top:22px;padding:12px;background:#0b2a4a;color:#fff;border:0;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer}.go:hover{background:#1a5a9c}
+#app{display:none;height:100%;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0b2a4a;color:#fff}
+header .logo{font-size:18px;color:#fff}header .logo span{color:#7fbcf5}
+header button{padding:7px 12px;border:1px solid #7fbcf5;background:none;color:#fff;border-radius:4px;cursor:pointer}
+main{flex:1;display:flex;min-height:0}
+#list{width:210px;overflow:auto;padding:10px;background:var(--pn);border-right:1px solid var(--ln)}
+#list h3{font-size:12px;color:var(--mu);margin:14px 0 4px 8px}
+#list button{display:block;width:100%;text-align:left;padding:7px 8px;border:0;background:none;color:var(--ink);border-radius:4px;cursor:pointer;font-size:13px}
+#list button:hover{background:var(--bg)}#list button.on{background:var(--ac);color:#fff}
+#cv{flex:1;min-width:0;position:relative;touch-action:none;overflow:hidden}
+#cv canvas{display:block;cursor:grab}
+#hint{position:absolute;left:10px;top:10px;background:var(--pn);border:1px solid var(--ln);padding:6px 10px;border-radius:4px;font-size:12px;color:var(--mu);pointer-events:none;max-width:70%}
+#tip{position:absolute;display:none;background:#0b2a4a;color:#fff;padding:4px 8px;border-radius:3px;font-size:12px;pointer-events:none;white-space:nowrap}
+#tools{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:center;background:var(--pn);border:1px solid var(--ln);padding:8px 10px;border-radius:6px;font-size:12px;width:calc(100% - 16px);max-width:760px}
+#tools button{padding:5px 9px;border:1px solid var(--ln);background:var(--bg);color:var(--ink);border-radius:4px;cursor:pointer;font-size:12px}
+#tools button:hover{border-color:var(--ac)}#tools label{margin:0;font-weight:400;display:flex;align-items:center;gap:6px}
+#tools input[type=range]{width:90px}
+#side{width:330px;background:var(--pn);border-left:1px solid var(--ln);padding:18px;overflow:auto}
+.tag{font-size:12px;background:var(--bg);color:var(--ac);padding:3px 8px;border-radius:10px}
+#side h2{margin:10px 0 2px;font-size:21px}.price{font-size:22px;font-weight:700;color:var(--ac);margin:6px 0}
+.d,.empty{color:var(--mu);font-size:14px;line-height:1.5}
+.zb{width:100%;padding:9px;margin:6px 0 4px;background:var(--ac);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:14px}
+dl{margin:0}dt{font-size:12px;color:var(--mu);margin-top:12px}dd{margin:2px 0 0;font-size:14px;line-height:1.4}
+footer{padding:6px;text-align:center;font-size:12px;color:var(--mu);background:var(--pn);border-top:1px solid var(--ln)}
+@media(max-width:860px){main{flex-direction:column}#list{width:100%;display:flex;gap:4px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--ln);padding:6px}#list h3{display:none}#list button{width:auto;white-space:nowrap;flex:none}#side{width:100%;height:36%;border-left:0;border-top:1px solid var(--ln)}#hint{display:none}}
+#cv{background:linear-gradient(#6fa8de,#cfe3f3 62%,#dfeaf2);transition:background .6s}header{flex-wrap:wrap;gap:6px}.hb{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.lgs,#ty{padding:6px;border-radius:4px;border:1px solid #7fbcf5;background:#0b2a4a;color:#fff}.card .lgs{margin-top:14px;background:#fff;color:#0b2a4a;border-color:#c5d2e2}
+#cart{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:9}#cart>div{background:var(--pn);color:var(--ink);padding:20px;border-radius:6px;width:min(420px,92%);max-height:80%;overflow:auto}
+.ln{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--ln);font-size:14px}.lk{display:block;text-align:center;padding:8px;margin-top:6px;border:1px solid var(--ac);color:var(--ac);border-radius:4px;text-decoration:none;font-size:14px}details{margin-top:10px;font-size:12px;color:var(--mu)}details input{width:100%;margin-top:6px;padding:7px;border:1px solid var(--ln);border-radius:4px;background:var(--bg);color:var(--ink)}
+input[type=email],input[type=password]{font-size:16px}html,body,#app{height:100dvh}
+#tg{display:none;position:absolute;right:8px;top:8px;z-index:2;padding:8px 12px;border:0;border-radius:20px;background:var(--ac);color:#fff;font-size:14px}
+@media(max-width:860px){header{padding:8px 10px}header .logo{font-size:15px}.hb{gap:4px}.hb select,.hb button{font-size:12px;padding:6px}#tg{display:block}#tools{display:none;bottom:8px;max-width:none}#tools.o{display:flex}#tools button{padding:8px 10px}#side{height:40%;padding:14px}#list button{padding:9px 12px;background:var(--bg)}#list button.on{background:var(--ac)}}
+#login{padding:0;align-items:stretch;background:#050f26}.pg{width:100%;height:100%;overflow:auto;color:#fff;scroll-behavior:smooth}
+.nav{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:20px;padding:12px 24px;background:#050f26e6;backdrop-filter:blur(8px)}.nav .logo{font-size:20px;margin-right:auto;color:#fff}.nav .logo span{color:#7fbcf5}.nav a{color:#cfe0f5;text-decoration:none;font-size:14px}
+.hero{position:relative;min-height:calc(100% - 56px);display:flex;align-items:center;overflow:hidden}.hero .bg{position:absolute;inset:0;width:100%;height:100%}.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#050f26ee 10%,#050f2655 75%);z-index:1}
+.hc{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between;width:100%;max-width:1100px;margin:0 auto;padding:40px 24px}.tx{flex:1 1 360px}.tx h2{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:0 0 14px}.tx p{color:#cfe0f5;font-size:17px;max-width:480px;line-height:1.5}.tx ul{display:flex;gap:22px;padding:0;list-style:none;margin:22px 0 0}.tx li b{display:block;font-size:24px}.tx li{font-size:13px;color:#9fb8d8}.hero .card{flex:0 0 360px;max-width:100%}
+.sec{padding:56px 24px;max-width:1100px;margin:0 auto}.sec h3{font-size:26px;margin:0 0 20px}.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.cc{background:#0d1f3d;border:1px solid #1d3a66;border-radius:6px;padding:20px;color:#cfe0f5;font-size:14px;line-height:1.5}.cc b{display:block;color:#fff;font-size:17px;margin-bottom:6px}
+.ct{max-width:520px}.ct input,.ct textarea{width:100%;margin-bottom:10px;padding:11px;border-radius:4px;border:1px solid #1d3a66;background:#0d1f3d;color:#fff;font-size:16px}.ft{padding:24px;text-align:center;font-size:12px;color:#7f98b8;border-top:1px solid #1d3a66}
+#lbs{position:absolute;inset:0;pointer-events:none;overflow:hidden;display:none}.lb{position:absolute;left:0;top:0;padding:5px 10px;background:#06142ccc;color:#dff2ff;border:1px solid #7fd0ff;border-radius:4px;font-size:12px;white-space:nowrap;transform:translate(34px,-50%)}.lb.l{transform:translate(calc(-100% - 34px),-50%)}.lb::before{content:'';position:absolute;top:50%;left:-34px;width:34px;height:1px;background:#7fd0ff}.lb.l::before{left:auto;right:-34px}.rel small{color:var(--mu)}
+main{position:relative}#pl{display:none;position:absolute;left:8px;top:8px;z-index:5;padding:8px 12px;border:0;border-radius:20px;background:var(--ac);color:#fff;font-size:14px}
+@media(max-width:860px){.hb select{max-width:104px}#side.mn{height:84px;overflow:hidden}.lb{font-size:11px;padding:3px 6px}}
+@media(orientation:landscape) and (max-height:520px){header{padding:4px 10px}header .logo{font-size:14px}.hb button,.hb select{padding:4px 6px;font-size:12px}footer{display:none}main{flex-direction:row;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}#list{position:absolute;left:0;top:0;bottom:0;z-index:4;width:210px;display:block;overflow-y:auto;overflow-x:hidden;transform:translateX(-100%);transition:transform .25s;border:0;border-right:1px solid var(--ln);padding:48px 10px 10px}#list.o{transform:none}#list h3{display:block}#list button{width:100%;white-space:normal}#pl,#tg{display:block}#tools{display:none;max-width:520px}#tools.o{display:flex}#side{width:36%;max-width:340px;height:auto;border-left:1px solid var(--ln);border-top:0;padding:12px}#side.mn{display:none}#hint{display:none}}
+#hint{display:none}
+#sb{position:absolute;top:8px;left:8px;right:64px;max-width:380px;z-index:4}#sb input{width:100%;padding:9px 12px;border-radius:20px;border:1px solid var(--ln);background:color-mix(in srgb,var(--pn) 82%,transparent);backdrop-filter:blur(12px);color:var(--ink);font-size:15px}
+#sg{display:none;margin-top:4px;background:var(--pn);border:1px solid var(--ln);border-radius:8px;overflow:hidden}#sg button{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;color:var(--ink);font-size:14px;cursor:pointer}#sg button:hover{background:var(--bg)}
+#fb{position:absolute;top:52px;left:8px;right:64px;z-index:3;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}#fb button{flex:none;padding:5px 10px;border-radius:14px;border:1px solid var(--ln);background:color-mix(in srgb,var(--pn) 82%,transparent);backdrop-filter:blur(10px);color:var(--ink);font-size:12px;cursor:pointer}#fb button.on{background:var(--ac);color:#fff;border-color:var(--ac)}#fb i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+#ib{position:absolute;top:8px;left:8px;right:60px;z-index:6;display:none;align-items:center;gap:8px;flex-wrap:wrap}#ib button{padding:9px 14px;border:0;border-radius:20px;background:var(--ac);color:#fff;font-size:14px;cursor:pointer}#ib .bc{flex:1;min-width:0;font-size:13px;color:#cfe0f5;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#ib .sq{background:#ffffff30;backdrop-filter:blur(8px);padding:9px 14px}
+#tc{position:absolute;left:50%;transform:translateX(-50%);bottom:64px;z-index:6;display:none;width:min(520px,92%);padding:12px 14px;border-radius:10px;background:#06142ccc;backdrop-filter:blur(10px);color:#fff;font-size:14px;line-height:1.4}#tc button{margin-top:8px;padding:6px 12px;border:1px solid #7fd0ff;background:none;color:#fff;border-radius:14px;cursor:pointer}
+#ld{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#050f26;color:#fff;transition:opacity .5s}#ld .logo{font-size:34px;color:#fff}#ld .logo span{color:#7fbcf5}#ld i{display:block;width:200px;height:3px;background:#1d3a66;position:relative;overflow:hidden}#ld i::after{content:'';position:absolute;inset:0;background:#19b3e6;animation:ldb 1s infinite}@keyframes ldb{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+#side,#tools,#list{background:color-mix(in srgb,var(--pn) 80%,transparent);backdrop-filter:blur(14px) saturate(1.2)}#side{transition:height .3s}#side>*{animation:fi .35s both}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.gg{height:8px;background:var(--bg);border-radius:4px;position:relative;margin-top:6px}.gg i{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,var(--ac),#19b3e6);border-radius:4px}.gl{display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-bottom:6px}.ch{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:10px;background:var(--bg);border:1px solid var(--ln);font-size:12px}
+@media(orientation:landscape) and (max-height:520px){#sb{left:56px;max-width:300px}#fb{left:56px}#ib{left:56px}}
+</style></head><body>
+<div id="login"><div class="card"><h1 class="logo">ALSTOM <span>CARE</span></h1><p>Connectez-vous à votre espace maintenance.</p>
+<label for="em">Email</label><input id="em" type="email" placeholder="prenom.nom@alstom.com">
+<label for="pw">Mot de passe</label><input id="pw" type="password" placeholder="••••••••">
+<button class="go" id="go">Se connecter</button><select class="lgs"></select></div></div>
+<div id="app"><header><h1 class="logo">ALSTOM <span>CARE</span></h1><div class="hb"><select id="ty"></select><select class="lgs"></select><button id="cb"></button><button id="qb">QR</button><button id="out">Déconnexion</button></div></header>
+<main><nav id="list" aria-label="Pièces"></nav>
+<div id="cv"><div id="hint">Cliquez une pièce · double-clic pour zoomer · glissez pour tourner · Maj+glisser pour déplacer</div><div id="tip"></div><button id="pl" aria-label="Pièces">☰</button><button id="tg" aria-label="Options">⚙</button>
+<div id="tools"><button id="zo">Zoom −</button><button id="zi">Zoom +</button><button id="rs">Recentrer</button>
+<button data-v="100">Opaque</button><button data-v="14">Rayons X</button><button data-v="0">Squelette</button>
+<label>Carrosserie <input id="op" type="range" min="0" max="100" value="100"></label>
+<label>Éclaté <input id="ex" type="range" min="0" max="100" value="0"></label>
+<label><input id="ar" type="checkbox"> Rotation auto</label></div></div>
+<aside id="side"></aside></main>
+<div id="cart"></div><footer>Données fictives à titre de démonstration</footer></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// [nom, catégorie, prix, matériaux, poids, quantité, durée de vie, maintenance, description, [label, valeur]]
+const D={
+moteur:["Moteur de traction","Traction","25 000 € – 60 000 €","Acier électrique laminé, cuivre, aluminium","800 – 1 500 kg","4 par voiture motrice","25 à 30 ans","Roulements contrôlés tous les 300 000 km, révision complète vers 1 000 000 km","Transforme l'énergie électrique en mouvement et entraîne les essieux.",["Puissance","250 – 500 kW (asynchrone triphasé)"]],
+convert:["Convertisseur de traction","Traction","40 000 € – 120 000 €","Modules IGBT, aluminium, circuit de refroidissement","500 – 1 200 kg","1 par bogie moteur","20 à 25 ans","Filtres nettoyés tous les 6 mois, contrôle thermique annuel","Convertit le courant en tension et fréquence variables pour piloter les moteurs."],
+transfo:["Transformateur principal","Énergie","80 000 € – 200 000 €","Cuivre, fer silicium, huile isolante","3 – 5 tonnes","1 par rame","30 ans","Analyse de l'huile chaque année, révision tous les 8 ans","Abaisse la haute tension de la caténaire à celle utilisée par la traction."],
+panto:["Pantographe","Énergie","15 000 € – 40 000 €","Aluminium, fibre de carbone, bande de frottement en carbone","100 – 200 kg","1 à 2 par rame","20 ans (bande : 30 000 à 100 000 km)","Contrôle visuel quotidien de la bande, révision annuelle","Capte le courant de la caténaire et l'amène au train.",["Tension","25 kV AC ou 1,5 kV DC"]],
+catenaire:["Caténaire","Énergie","300 000 € – 1 M€ par km","Fil de contact en cuivre, câble porteur, mâts en acier","≈ 1,4 kg/m (fil de contact)","1 ligne aérienne","40 ans","Inspection par train de mesure, fil remplacé à l'usure","Ligne aérienne qui alimente le train en électricité.",["Tension","25 kV AC"]],
+roue:["Roue","Roulement","2 500 € – 6 000 €","Acier forgé laminé (ER7/ER8)","300 – 400 kg","8 par voiture","1 à 1,5 million de km, avec reprofilage","Ultrasons, reprofilage tous les 200 000 km","Roue monobloc au profil conique, qui guide le train et supporte la charge.",["Diamètre","≈ 920 mm neuve"]],
+essieu:["Essieu monté","Roulement","6 000 € – 15 000 €","Acier forgé (nuance EA4T)","1 200 – 1 800 kg","4 par voiture","30 ans","Ultrasons tous les 300 000 km","Axe qui relie deux roues et transmet la charge et l'effort moteur.",["Charge à l'essieu","≈ 17 t max"]],
+bogie:["Bogie","Roulement","80 000 € – 200 000 €","Châssis en acier soudé, suspensions acier/caoutchouc","6 à 10 tonnes","2 par voiture","30 ans","Révision générale tous les 1 000 000 km environ","Châssis porteur qui regroupe essieux, suspensions, freins et moteurs."],
+susp:["Suspension primaire","Roulement","1 500 € – 4 000 € l'unité","Ressorts hélicoïdaux en acier, amortisseurs hydrauliques","30 – 60 kg","8 par voiture","15 à 20 ans","Contrôle visuel semestriel, amortisseurs changés vers 1 000 000 km","Filtre les chocs de la voie, améliore le confort et la stabilité."],
+frein:["Système de freinage","Freinage","20 000 € – 50 000 € par voiture","Disques acier ou fonte, garnitures composites, circuits pneumatiques","400 – 800 kg par voiture","8 disques par voiture","Disques 10 ans, garnitures 1 à 3 ans","Usure des garnitures contrôlée tous les 3 mois","Frein à disques, combiné au freinage électrique par récupération d'énergie."],
+rail:["Rail","Voie","60 € – 120 € le mètre","Acier au carbone (profil 60E1)","≈ 60 kg par mètre","2 files de rails","30 à 40 ans selon le trafic","Meulage régulier, ultrasons, contrôle de géométrie","Voie de roulement en acier soudé en barres longues, sur traverses béton.",["Écartement","1 435 mm"]],
+vis:["Visserie et fixations","Structure","1 € – 50 € la pièce","Acier haute résistance (classe 10.9), anti-corrosion","20 g – 1 kg","Plusieurs milliers par voiture","15 à 30 ans","Couple de serrage vérifié à chaque révision","Boulons et clips qui assemblent roues, bogies et voie."],
+attelage:["Attelage automatique","Structure","15 000 € – 40 000 €","Acier moulé, ressorts de choc, connecteurs électriques","300 – 600 kg","2 par voiture","30 ans","Graissage et contrôle tous les 6 mois","Relie les voitures mécaniquement, pneumatiquement et électriquement."],
+porte:["Porte passagers","Accès","8 000 € – 20 000 €","Aluminium, verre feuilleté, joints EPDM","120 – 200 kg","4 par voiture","30 ans (≈ 1,5 million de cycles)","Inspection trimestrielle, joints remplacés tous les 5 ans","Porte coulissante électrique avec détection d'obstacle et verrouillage de sécurité."],
+siege:["Siège passager","Confort","400 € – 1 500 €","Structure aluminium, mousse ignifugée, tissu anti-feu","15 – 25 kg","≈ 56 par voiture","10 à 15 ans","Nettoyage quotidien, revêtement changé tous les 5 à 7 ans","Siège normé feu et vandalisme, avec option prise USB et accoudoir."],
+vitre:["Fenêtre latérale","Confort","600 € – 2 500 €","Verre feuilleté trempé, cadre aluminium, joints","25 – 50 kg","12 par voiture","20 à 30 ans","Inspection mensuelle, remplacement si rayure ou fissure","Vitrage isolant thermique et acoustique, anti-éclats et filtrant les UV."],
+clim:["Climatisation","Confort","10 000 € – 25 000 €","Aluminium, cuivre, fluide R134a ou CO2","300 – 500 kg (unité de toit)","2 par voiture","15 à 20 ans","Filtres tous les 3 mois, fluide contrôlé chaque année","Unité de toit qui régule la température et la qualité de l'air."],
+pare:["Pare-brise (cabine)","Sécurité","5 000 € – 15 000 €","Verre feuilleté multicouche, film chauffant","80 – 120 kg","1 par cabine","10 à 15 ans","Inspection après chaque impact, remplacement si fissure","Résiste aux chocs et aux projectiles, avec dégivrage intégré."],
+phare:["Phare LED","Sécurité","800 € – 3 000 € l'ensemble","Boîtier aluminium, optique polycarbonate, LED","3 – 8 kg","2 par cabine","10 à 15 ans (LED ≈ 50 000 h)","Nettoyage mensuel, éclairement vérifié chaque année","Signale le train à l'avant, feux de croisement et de route."]};
+const $=id=>document.getElementById(id);
+$('go').onclick=()=>{$('login').style.display='none';$('app').style.display='flex';init()};
+$('out').onclick=()=>{$('app').style.display='none';$('login').style.display='flex'};
+['em','pw'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()}));
+const cats=[...new Set(Object.values(D).map(p=>p[1]))];
+$('list').innerHTML=cats.map(c=>`<h3>${c}</h3>`+Object.keys(D).filter(k=>D[k][1]===c).map(k=>`<button data-k="${k}">${D[k][0]}</button>`).join('')).join('');
+$('list').onclick=e=>{const k=e.target.dataset.k;if(k)go(k)};
+
+let sc,cam,ren,ray,mats={},picks=[],all=[],shell=[],edges=[],sel=null,hov=null,lastO=null,ready=0;
+const R={th:.9,ph:1.25,rad:30},G={...R,t:new THREE.Vector3(0,2.4,0)},C={...R,t:new THREE.Vector3(0,2.4,0)};
+const B=(w,h,d)=>new THREE.BoxGeometry(w,h,d),Cy=(r,h,s=16)=>new THREE.CylinderGeometry(r,r,h,s),clR=r=>Math.max(3,Math.min(70,r));
+function mk(k,g,c,x,y,z,o,rz){const id=k+c;if(!mats[id]){mats[id]=new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.35,...(o||{})});mats[id].userData.k=k}
+ const m=new THREE.Mesh(g,mats[id]);m.position.set(x,y,z);if(rz)m.rotation.z=rz;m.userData.k=k;m.userData.b=m.position.clone();sc.add(m);all.push(m);if(k)picks.push(m);return m}
+function sh(g,x,y,z,c){const m=mk(null,g,c||0xeef2f7,x,y,z,{transparent:true});shell.push(m);
+ const l=new THREE.LineSegments(new THREE.EdgesGeometry(g,20),new THREE.LineBasicMaterial({color:0x1a73c9}));l.visible=false;m.add(l);edges.push(l);return m}
+
+function build(){
+ const T=TY[type],L=T.L,W=T.W,s=L/16,Y0=1.35,H=2.5,YC=Y0+H/2,PX=-1.6*s;
+ mk(null,B(80,.12,4.4),0x8f8c88,0,0,0);
+ for(let x=-34;x<35;x+=.9)mk(null,B(.3,.1,2.4),0x6e6a66,x,.11,0);
+ for(const z of[-.72,.72]){mk('rail',B(80,.18,.12),0x9aa4ae,0,.25,z);for(let x=-13;x<14;x+=1.8)mk('vis',B(.1,.04,.34),0x3a4047,x,.35,z)}
+ // caisse
+ {const w=W/2,r=.4,pr=new THREE.Shape();pr.moveTo(-w,0);pr.lineTo(w,0);pr.lineTo(w,H-r);pr.quadraticCurveTo(w,H,w-r,H);pr.lineTo(-w+r,H);pr.quadraticCurveTo(-w,H,-w,H-r);pr.lineTo(-w,0);
+const bg=new THREE.ExtrudeGeometry(pr,{depth:L,bevelEnabled:false});bg.translate(0,0,-L/2);bg.rotateY(Math.PI/2);sh(bg,0,Y0,0);
+const bd=(a,b,c)=>{const q=new THREE.Shape();q.moveTo(-w-.02,a);q.lineTo(w+.02,a);q.lineTo(w+.02,b);q.lineTo(-w-.02,b);const g=new THREE.ExtrudeGeometry(q,{depth:L+.02,bevelEnabled:false});g.translate(0,0,-L/2-.01);g.rotateY(Math.PI/2);sh(g,0,Y0,0,c)};bd(0,.95,0x0b2a6f);bd(.95,1.07,T.c)}
+ const sp=new THREE.Shape();T.n.forEach((p,i)=>i?sp.lineTo(p[0],p[1]):sp.moveTo(p[0],p[1]));
+ const ng=new THREE.ExtrudeGeometry(sp,{depth:W-.5,bevelEnabled:true,bevelSize:.2,bevelThickness:.25,bevelSegments:3});ng.translate(0,0,-(W-.5)/2);sh(ng,L/2,Y0,0);
+ mk(null,B(L-.4,.1,W-.3),0x7c8794,0,Y0+.15,0);
+ {const a=T.n[2],b=T.n[3];mk('pare',B(Math.hypot(b[0]-a[0],b[1]-a[1]),.06,W*.78),0x16283b,L/2+(a[0]+b[0])/2+.16,Y0+(a[1]+b[1])/2+.18,0,{transparent:true,opacity:.75},Math.atan2(b[1]-a[1],b[0]-a[0]))}
+ for(const z of[-.85,.85])mk('phare',new THREE.SphereGeometry(.14,12,8),0xfff2b0,L/2+T.n[2][0]+.18,Y0+T.n[2][1]*.65,z);
+ mk('attelage',Cy(.12,.9,10),0x555e68,L/2+T.n[1][0]+.35,Y0+.1,0).rotation.z=Math.PI/2;
+ mk('attelage',Cy(.12,.9,10),0x555e68,-L/2-.4,Y0+.1,0).rotation.z=Math.PI/2;
+ // fenêtres et portes
+ for(const t of[-1,1]){const z=t*W/2;
+  [-7.2,-3.4,-1.4,.6,5.2,7].forEach(x=>{x*=s;mk(null,B(1.55,.95,.06),0x1c2733,x,YC+.45,z+t*.01);mk('vitre',B(1.4,.8,.06),0x7fb3dc,x,YC+.45,z+t*.04,{transparent:true,opacity:.5})});
+  [-5.2,3.2].forEach(x=>{x*=s;mk(null,B(1.5,2.2,.06),0x1c2733,x,Y0+1.2,z+t*.01);mk('porte',B(1.3,2.05,.1),0x174a9c,x,Y0+1.17,z+t*.06);
+   mk(null,B(.8,.8,.04),0x2b3f55,x,Y0+1.5,z+t*.12);mk(null,B(.06,.5,.04),0xd8dde3,x+.5,Y0+1,z+t*.12)})}
+ // sièges
+ for(const x0 of[-7.2,-6.4,-3.8,-3,-2.2,-1.4,-.6,.2,1,1.8,4.6,5.4,6.2,7])for(const t of[-1,1]){const x=x0*s;
+  mk('siege',B(.6,.1,.6),0x2f6fb0,x,Y0+.6,t*.95);mk('siege',B(.1,.75,.6),0x24598f,x-.25,Y0+1,t*.95)}
+ // toit : clim + pantographe
+ for(const x of[3.6*s,-7*s]){mk('clim',B(2.6,.5,1.6),0x9aa7b5,x,Y0+H+.25,0);for(const d of[-.7,.7])mk('clim',Cy(.45,.06,20),0x4d5560,x+d,Y0+H+.53,0)}
+ if(T.el){for(const z of[-.5,.5])mk('panto',Cy(.1,.35,10),0xc9a46a,PX,Y0+H+.18,z);
+ mk('panto',B(.6,.1,1.2),0x333a42,PX,Y0+H+.4,0);
+ const arm=(a,b,c,d,z)=>mk('panto',B(Math.hypot(c-a,d-b),.07,.07),0x2d3338,(a+c)/2,(b+d)/2,z,0,Math.atan2(d-b,c-a));
+ for(const z of[-.35,.35]){arm(PX,4.3,PX-.75,5.1,z);arm(PX-.75,5.1,PX,5.85,z)}
+ mk('panto',B(.18,.06,1.8),0x1a1a1a,PX,5.9,0);
+ // caténaire
+ mk('catenaire',B(80,.05,.05),0x3b3b3b,0,5.97,0);mk('catenaire',B(80,.04,.04),0x3b3b3b,0,6.45,0);
+ for(let x=-24;x<=24;x+=12){mk('catenaire',B(.16,6.8,.16),0x7d848c,x,3.4,2.6);mk('catenaire',B(.1,.1,2.6),0x7d848c,x,6.3,1.3)}
+ for(let x=-24;x<=24;x+=4)mk('catenaire',B(.02,.48,.02),0x3b3b3b,x,6.2,0);}
+ // sous caisse
+ mk('transfo',B(2.2,.8,1.8),0x5c6b7a,-1.8*s,.95,0);mk('convert',B(1.6,.6,1.7),0x3f8f8a,1.3*s,1.05,0);
+ // bogies
+ for(const bx of[-5.5*s,5*s]){
+  for(const z of[-.95,.95]){mk('bogie',B(3.4,.3,.25),0x3d4a59,bx,1.05,z);for(const k of[-1.2,-.4,.4,1.2])mk('vis',Cy(.05,.06,6),0x222,bx+k,1.23,z)}
+  for(const k of[-.8,.8])mk('bogie',B(.3,.3,1.9),0x3d4a59,bx+k,1.05,0);
+  for(const a of[-1.2,1.2]){const x=bx+a;
+   mk('essieu',Cy(.09,1.9,12),0x7d8791,x,.8,0).rotation.x=Math.PI/2;
+   mk('moteur',Cy(.3,.9,18),0xd9822b,x,.8,0).rotation.x=Math.PI/2;
+   for(const z of[-.72,.72]){const q=Math.sign(z);
+    mk('roue',Cy(.46,.14,28),0x4c5560,x,.8,z).rotation.x=Math.PI/2;
+    mk('roue',Cy(.14,.2,12),0x69737d,x,.8,z+q*.04).rotation.x=Math.PI/2;
+    mk('frein',Cy(.33,.05,24),0xb04a3a,x,.8,q*.52).rotation.x=Math.PI/2;
+    mk('susp',Cy(.13,.35,12),0xd4b13a,x,.88,q*.95);
+    for(let i=0;i<8;i++){const a2=i*Math.PI/4;mk('vis',Cy(.03,.05,6),0x222,x+.3*Math.cos(a2),.8+.3*Math.sin(a2),z+q*.09).rotation.x=Math.PI/2}}}}
+}
+function init(){
+ if(ready)return;ready=1;const cv=$('cv');
+ sc=new THREE.Scene();sc.fog=new THREE.Fog(0xcfe3f3,70,240);
+ cam=new THREE.PerspectiveCamera(42,1,.1,300);ren=new THREE.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(devicePixelRatio,innerWidth<900?1.5:2));cv.prepend(ren.domElement);
+ sc.add(new THREE.HemisphereLight(0xffffff,0x6b7f95,.95));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(10,20,12);sc.add(dl);
+ ray=new THREE.Raycaster();build();buildEnv();renderList();applyLang();
+ new ResizeObserver(()=>{const w=cv.clientWidth,h=cv.clientHeight;if(w&&h){ren.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}}).observe(cv);
+ bind();panel(null);loop();
+}
+function loop(){requestAnimationFrame(loop);if(!$('app').offsetParent)return;
+ if($('ar').checked)G.th+=.004;const k=.14;
+ C.th+=(G.th-C.th)*k;C.ph+=(G.ph-C.ph)*k;C.rad+=(G.rad-C.rad)*k;C.t.lerp(G.t,k);
+ cam.position.set(C.t.x+C.rad*Math.sin(C.ph)*Math.cos(C.th),C.t.y+C.rad*Math.cos(C.ph),C.t.z+C.rad*Math.sin(C.ph)*Math.sin(C.th));cam.lookAt(C.t);ren.render(sc,cam)}
+function pick(e){const r=ren.domElement.getBoundingClientRect();
+ ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),cam);
+ if(insp)return null;const op=+$('op').value>35;
+ for(const h of ray.intersectObjects(op?all:picks,false)){if(h.object.userData.k)return h;if(op&&shell.includes(h.object))return null}return null}
+function refresh(){for(const id in mats){const m=mats[id],k=m.userData.k;m.emissive.setHex(k&&k===sel?0x1a5fb4:k&&k===hov?0x1c3f6e:0)}
+ document.querySelectorAll('#list button').forEach(b=>b.classList.toggle('on',b.dataset.k===sel))}
+function focus(o,pt){const s=new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());G.t.copy(pt||new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3()));G.rad=clR(Math.max(4,Math.min(Math.max(s.x,s.y,s.z),5)*2.6))}
+function select(k,o){sel=k;if(o)lastO=o;refresh();panel(k)}
+function go(k){const o=picks.filter(m=>m.userData.k===k).sort((a,b)=>a.position.distanceTo(cam.position)-b.position.distanceTo(cam.position))[0];
+ if(k==='siege'&&+$('op').value>35)setOp(14);select(k,o)}
+function panel(k){const s=$('side');if(!k){s.innerHTML='<p class="empty">Sélectionnez une pièce sur le train ou dans la liste pour afficher son prix et sa fiche technique.</p>';return}
+ const p=D[k],r=(a,b)=>b?`<dt>${a}</dt><dd>${b}</dd>`:'';
+ s.innerHTML=`<span class="tag">${p[1]}</span><h2>${p[0]}</h2><div class="price">${p[2]}</div><p class="d">${p[8]}</p><button class="zb" id="zb">Zoomer sur la pièce</button><dl>${r('Matériaux',p[3])}${r('Poids',p[4])}${r('Quantité',p[5])}${p[9]?r(p[9][0],p[9][1]):''}${r('Durée de vie',p[6])}${r('Maintenance',p[7])}</dl>`;
+ $('zb').onclick=()=>lastO&&focus(lastO);s.scrollTop=0}
+function setOp(v){$('op').value=v;shell.forEach(m=>{const t=m.material;t.opacity=v/100;t.depthWrite=v>=100});edges.forEach(l=>l.visible=v<90)}
+function setEx(t){all.forEach(m=>{const b=m.userData.b,k=m.userData.k;if(b.y>.4&&k!=='catenaire')m.position.set(b.x,b.y+(b.y-2.4)*t*.9,b.z+b.z*t*.8)})}
+$('op').oninput=e=>setOp(+e.target.value);$('ex').oninput=e=>setEx(e.target.value/100);
+document.querySelectorAll('#tools [data-v]').forEach(b=>b.onclick=()=>setOp(+b.dataset.v));
+$('zi').onclick=()=>G.rad=clR(G.rad*.75);$('zo').onclick=()=>G.rad=clR(G.rad*1.33);
+$('rs').onclick=()=>{Object.assign(G,R);G.t.set(0,2.4,0)};
+function bind(){const el=ren.domElement,pts=new Map(),tip=$('tip');let pd=0,mv=0;
+ const dist=()=>{const[a,b]=[...pts.values()];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)};
+ const hit=h=>select(h?h.object.userData.k:null,h&&h.object);
+ el.oncontextmenu=e=>e.preventDefault();
+ el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pts.set(e.pointerId,e);mv=0;if(pts.size==2)pd=dist()});
+ el.addEventListener('pointermove',e=>{
+  if(pts.has(e.pointerId)){const p=pts.get(e.pointerId);pts.set(e.pointerId,e);
+   if(pts.size==2){const d=dist();G.rad=clR(G.rad*pd/d);pd=d;mv=9;return}
+   const dx=e.clientX-p.clientX,dy=e.clientY-p.clientY;mv+=Math.abs(dx)+Math.abs(dy);
+   if(e.shiftKey||e.buttons==2){const s=G.rad*.0016;G.t.x-=Math.sin(G.th)*dx*s;G.t.z+=Math.cos(G.th)*dx*s;G.t.y+=dy*s}
+   else{G.th-=dx*.008;G.ph=Math.max(.15,Math.min(1.55,G.ph-dy*.008))}tip.style.display='none'}
+  else{const h=pick(e),k=h?h.object.userData.k:null;
+   if(k!==hov){hov=k;refresh();el.style.cursor=k?'pointer':'grab'}
+   if(k){const r=el.getBoundingClientRect();tip.textContent=nm(k);tip.style.left=e.clientX-r.left+14+'px';tip.style.top=e.clientY-r.top+14+'px';tip.style.display='block'}else tip.style.display='none'}});
+ el.addEventListener('pointerup',e=>{const was=pts.size==1;pts.delete(e.pointerId);if(was&&mv<6&&!insp)hit(pick(e))});
+ el.addEventListener('dblclick',e=>{if(insp)return;const h=pick(e);if(h){hit(h);focus(h.object,h.point)}else $('rs').click()});
+ el.addEventListener('wheel',e=>{e.preventDefault();G.rad=clR(G.rad*(1+e.deltaY*.001))},{passive:false});
+}
+// ===== v3 : variantes, langues, panier, inspection, décor =====
+const TY={
+tgv:{L:22,W:2.9,c:0x1a73c9,el:1,n:[[0,0],[5.5,.3],[6,.9],[1.5,2.5],[0,2.5]]},
+metro:{L:14,W:2.8,c:0x2f9e44,el:0,n:[[0,0],[.6,.1],[.6,.9],[.3,2.5],[0,2.5]]},
+tram:{L:13,W:2.5,c:0xd9534f,el:1,n:[[0,0],[1,.15],[1.1,.8],[.3,2.5],[0,2.5]]}};
+let type='tgv',lang='fr',insp=0,cart={},saved,insG,stars;const envs=[];
+const SM={vis:[1,50],phare:[800,3000],susp:[1500,4000]};
+const LK=(()=>{try{return JSON.parse(localStorage.getItem('ac_lk')||'{}')}catch(e){return{}}})();
+const I={fr:{sub:`Connectez-vous à votre espace maintenance.`,em:'Email',pw:'Mot de passe',go:'Se connecter',out:'Déconnexion',cart:'Panier',hint:`Cliquez une pièce pour l'extraire · glissez pour tourner · Maj+glisser pour déplacer`,zo:'Zoom −',zi:'Zoom +',rs:'Recentrer',op:'Opaque',xr:'Rayons X',sk:'Squelette',body:'Carrosserie',ex:'Éclaté',ar:'Rotation auto',foot:'Données fictives à titre de démonstration',empty:`Sélectionnez une pièce sur le train ou dans la liste pour l'extraire et l'inspecter.`,mat:'Matériaux',w:'Poids',q:'Quantité',life:'Durée de vie',mt:'Maintenance',site:'Site officiel Alstom',fiche:'Ma fiche technique',ct:'Mon contact',lnk:'Ajouter ma fiche technique et un contact',ph1:'URL de la fiche technique',ph2:'Email ou URL de contact',add:'Ajouter au panier',back:'Retour au train',ctitle:'Mon panier',cempty:'Panier vide.',tot:'Total estimé',clr:'Vider le panier',cls:'Fermer',tgv:'Train à grande vitesse',metro:'Métro',tram:'Tramway'},
+en:{sub:'Sign in to your maintenance workspace.',em:'Email',pw:'Password',go:'Sign in',out:'Sign out',cart:'Cart',hint:'Click a part to extract it · drag to rotate · Shift+drag to pan',zo:'Zoom −',zi:'Zoom +',rs:'Reset view',op:'Opaque',xr:'X-ray',sk:'Skeleton',body:'Bodyshell',ex:'Exploded',ar:'Auto-rotate',foot:'Fictional data for demonstration purposes',empty:'Select a part on the train or in the list to extract and inspect it.',mat:'Materials',w:'Weight',q:'Quantity',life:'Service life',mt:'Maintenance',site:'Official Alstom website',fiche:'My datasheet',ct:'My contact',lnk:'Add my datasheet and a contact',ph1:'Datasheet URL',ph2:'Contact email or URL',add:'Add to cart',back:'Back to train',ctitle:'My cart',cempty:'Cart is empty.',tot:'Estimated total',clr:'Clear cart',cls:'Close',tgv:'High-speed train',metro:'Metro',tram:'Tram'}};
+const CN={'Traction':'Traction','Énergie':'Power','Roulement':'Running gear','Freinage':'Braking','Voie':'Track','Structure':'Structure','Accès':'Access','Confort':'Comfort','Sécurité':'Safety'};
+const XL={'Puissance':'Power','Tension':'Voltage','Diamètre':'Diameter','Écartement':'Track gauge',"Charge à l'essieu":'Axle load'};
+const EN={moteur:['Traction motor','Converts electrical energy into motion and drives the axles.'],convert:['Traction converter','Converts power to variable voltage and frequency to drive the motors.'],transfo:['Main transformer','Steps the catenary high voltage down for the traction system.'],panto:['Pantograph','Collects current from the overhead line and feeds the train.'],catenaire:['Overhead line','Overhead wire that powers the train with electricity.'],roue:['Wheel','One-piece conical wheel that guides the train and carries the load.'],essieu:['Wheelset axle','Axle linking two wheels; carries the load and traction effort.'],bogie:['Bogie','Load-bearing frame holding axles, suspension, brakes and motors.'],susp:['Primary suspension','Filters track shocks and improves comfort and stability.'],frein:['Braking system','Disc brakes combined with regenerative electric braking.'],rail:['Rail','Welded steel running surface on concrete sleepers.'],vis:['Bolts and fasteners','Bolts and clips that assemble wheels, bogies and track.'],attelage:['Automatic coupler','Links cars mechanically, pneumatically and electrically.'],porte:['Passenger door','Electric sliding door with obstacle detection and safety locking.'],siege:['Passenger seat','Fire- and vandal-rated seat, optional USB and armrest.'],vitre:['Side window','Insulating, shatter-resistant, UV-filtering glazing.'],clim:['Air conditioning','Roof unit regulating temperature and air quality.'],pare:['Windscreen (cab)','Impact-resistant glass with built-in demisting.'],phare:['LED headlight','Signals the train ahead, with dipped and main beams.']};
+const T_=k=>I[lang][k],nm=k=>lang=='en'?EN[k][0]:D[k][0],ct=k=>lang=='en'?CN[D[k][1]]:D[k][1],ds=k=>lang=='en'?EN[k][1]:D[k][8];
+function renderList(){const ks=Object.keys(D).filter(k=>picks.some(m=>m.userData.k===k)),cs=[...new Set(ks.map(ct))];
+ $('list').innerHTML=cs.map(c=>`<h3>${c}</h3>`+ks.filter(k=>ct(k)===c).map(k=>`<button data-k="${k}"${k===sel?' class="on"':''}>${nm(k)}</button>`).join('')).join('')}
+function cartBtn(){$('cb').textContent=T_('cart')+' ('+Object.values(cart).reduce((a,b)=>a+b,0)+')'}
+function applyLang(){const q=(s,v)=>{const e=document.querySelector(s);if(e)e.textContent=v};
+ q('.card p',T_('sub'));q('label[for=em]',T_('em'));q('label[for=pw]',T_('pw'));q('#go',T_('go'));q('#out',T_('out'));q('#zo',T_('zo'));q('#zi',T_('zi'));q('#rs',T_('rs'));q('#hint',T_('hint'));q('footer',T_('foot'));
+ ['op','xr','sk'].forEach((k,i)=>document.querySelectorAll('#tools [data-v]')[i].textContent=T_(k));
+ $('op').parentNode.firstChild.nodeValue=T_('body')+' ';$('ex').parentNode.firstChild.nodeValue=T_('ex')+' ';$('ar').parentNode.lastChild.nodeValue=' '+T_('ar');
+ $('ty').innerHTML=Object.keys(TY).map(k=>`<option value="${k}"${k==type?' selected':''}>${T_(k)}</option>`).join('');
+ document.querySelectorAll('.lgs').forEach(s=>s.value=lang);cartBtn();if(ready){renderList();panel(sel)}}
+document.querySelectorAll('.lgs').forEach(s=>{s.innerHTML='<option value="fr">Français</option><option value="en">English</option>';s.onchange=e=>{lang=e.target.value;applyLang()}});
+$('ty').onchange=e=>setType(e.target.value);$('cb').onclick=openCart;addEventListener('keydown',e=>{if(e.key==='Escape')exitInspect()});
+function setType(t){if(insp)exitInspect();type=t;all.forEach(m=>sc.remove(m));all=[];picks=[];shell=[];edges=[];mats={};build();setOp(+$('op').value);setEx($('ex').value/100);sel=null;lastO=null;panel(null);renderList();Object.assign(G,R);G.t.set(0,2.4,0)}
+function buildEnv(){const E=(g,c,x,y,z,r)=>{const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({color:c,flatShading:true}));m.position.set(x,y,z);if(r)m.rotation.y=r;sc.add(m);envs.push(m);return m};
+ E(new THREE.PlaneGeometry(400,400),0x5f8f4e,0,-.08,0).rotation.x=-Math.PI/2;
+ for(let i=0;i<14;i++){const a=i*Math.PI/7+Math.random()*.3,R2=115+Math.random()*30,r=28+Math.random()*24,h=40+Math.random()*45,x=R2*Math.cos(a),z=R2*Math.sin(a);E(new THREE.ConeGeometry(r,h,7),0x6f7f8c,x,h/2-1,z,i);E(new THREE.ConeGeometry(r*.3,h*.3,7),0xf4f8fb,x,h*.85-1,z,i)}
+ for(let i=0;i<90;i++){const x=(Math.random()-.5)*130,z=(Math.random()<.5?-1:1)*(7+Math.random()*45),h=3+Math.random()*4;E(new THREE.ConeGeometry(h*.35,h,7),0x2f6b3a,x,h/2,z)}}
+function mkStars(){const p=[];for(let i=0;i<500;i++){const a=Math.random()*6.283,b=Math.acos(2*Math.random()-1);p.push(60*Math.sin(b)*Math.cos(a),60*Math.cos(b),60*Math.sin(b)*Math.sin(a))}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));stars=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:1,fog:false}));sc.add(stars)}
+function inspect(k,o){if(!insp){insp=1;saved={th:G.th,ph:G.ph,rad:G.rad,t:G.t.clone(),ar:$('ar').checked,fog:sc.fog};all.forEach(m=>m.visible=false);envs.forEach(m=>m.visible=false);sc.fog=null;$('cv').style.background='#000';$('ar').checked=true;if(!stars)mkStars();stars.visible=true;$('tip').style.display='none'}
+ if(insG)sc.remove(insG);insG=new THREE.Group();const grp=new THREE.Group(),r=({panto:3,siege:.6})[k]||1;
+ picks.filter(m=>m.userData.k===k&&m.position.distanceTo(o.position)<r).forEach(m=>{const p=m.geometry.parameters,g=p&&p.width>12?B(5,p.height,p.depth):m.geometry;
+  const c=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0x3aa0ff,transparent:true,opacity:.2,depthWrite:false}));c.position.copy(m.position);c.rotation.copy(m.rotation);
+  c.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,15),new THREE.LineBasicMaterial({color:0x9fe0ff})));grp.add(c)});
+ const bb=new THREE.Box3().setFromObject(grp),ctr=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());grp.children.forEach(c=>c.position.sub(ctr));
+ insG.add(grp);insG.scale.setScalar(3.2/Math.max(sz.x,sz.y,sz.z,.01));sc.add(insG);G.t.set(0,0,0);G.rad=7.5;G.ph=1.2}
+function exitInspect(){if(!insp)return;insp=0;sc.remove(insG);stars.visible=false;all.forEach(m=>m.visible=true);envs.forEach(m=>m.visible=true);sc.fog=saved.fog;$('cv').style.background='';$('ar').checked=saved.ar;G.th=saved.th;G.ph=saved.ph;G.rad=saved.rad;G.t.copy(saved.t);sel=null;refresh();panel(null)}
+function select(k,o){sel=k;if(o)lastO=o;if(k&&o)inspect(k,o);refresh();panel(k)}
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'),sv=()=>{try{localStorage.setItem('ac_lk',JSON.stringify(LK))}catch(e){}};
+function panel(k){const s=$('side');if(!k){s.innerHTML=`<p class="empty">${T_('empty')}</p>`;return}
+ const p=D[k],r=(a,b)=>b?`<dt>${a}</dt><dd>${b}</dd>`:'',l=LK[k]||{},a=(h,t)=>`<a class="lk" target="_blank" rel="noopener" href="${esc(h)}">${t}</a>`;
+ const c=l.c?(/^https?:\/\//.test(l.c)?l.c:l.c.includes('@')?'mailto:'+l.c:''):'';
+ s.innerHTML=`<span class="tag">${ct(k)}</span><h2>${nm(k)}</h2><div class="price">${p[2]}</div><p class="d">${ds(k)}</p>${insp?`<button class="zb" id="zb">${T_('back')}</button>`:''}${SM[k]?`<button class="zb" id="ad">${T_('add')}</button>`:''}<dl>${r(T_('mat'),p[3])}${r(T_('w'),p[4])}${r(T_('q'),p[5])}${p[9]?r(lang=='en'&&XL[p[9][0]]||p[9][0],p[9][1]):''}${r(T_('life'),p[6])}${r(T_('mt'),p[7])}</dl>${a('https://www.alstom.com',T_('site'))}${/^https?:\/\//.test(l.d||'')?a(l.d,T_('fiche')):''}${c?a(c,T_('ct')):''}<details${l.d||l.c?' open':''}><summary>${T_('lnk')}</summary><input id="l1" placeholder="${T_('ph1')}" value="${esc(l.d)}"><input id="l2" placeholder="${T_('ph2')}" value="${esc(l.c)}"></details>`;
+ if($('zb'))$('zb').onclick=exitInspect;if($('ad'))$('ad').onclick=()=>{cart[k]=(cart[k]||0)+1;cartBtn();$('ad').textContent='✓ '+T_('add')};
+ $('l1').onchange=e=>{LK[k]=Object.assign(LK[k]||{},{d:e.target.value.trim()});sv();panel(k)};$('l2').onchange=e=>{LK[k]=Object.assign(LK[k]||{},{c:e.target.value.trim()});sv();panel(k)};s.scrollTop=0}
+function openCart(){const c=$('cart'),ks=Object.keys(cart).filter(k=>cart[k]>0);let a=0,b=0;const fm=n=>n.toLocaleString(lang=='en'?'en-GB':'fr-FR')+' €';
+ const rows=ks.map(k=>{a+=cart[k]*SM[k][0];b+=cart[k]*SM[k][1];return `<div class="ln"><span>${nm(k)}<br><small>${fm(SM[k][0])} – ${fm(SM[k][1])}</small></span><span><button data-d="-1" data-k="${k}">−</button> ${cart[k]} <button data-d="1" data-k="${k}">+</button></span></div>`}).join('');
+ c.innerHTML=`<div><h2>${T_('ctitle')}</h2>${ks.length?rows+`<p><b>${T_('tot')} : ${fm(a)} – ${fm(b)}</b></p><button class="zb" id="cc">${T_('clr')}</button>`:`<p>${T_('cempty')}</p>`}<button class="zb" id="cx">${T_('cls')}</button></div>`;
+ c.style.display='flex';c.onclick=e=>{const t=e.target;if(t===c||t.id==='cx')c.style.display='none';else if(t.id==='cc'){cart={};cartBtn();openCart()}else if(t.dataset.d){cart[t.dataset.k]=Math.max(0,cart[t.dataset.k]+ +t.dataset.d);cartBtn();openCart()}}}
+applyLang();
+const APP='https://claude.ai/artifact/76eBruZrjYhtyNhsusGWJy';
+$('tg').onclick=()=>$('tools').classList.toggle('o');
+$('qb').onclick=()=>{const c=$('cart'),fr=lang=='fr';c.innerHTML=`<div style="text-align:center"><h2>${fr?'Ouvrir sur téléphone':'Open on your phone'}</h2><div id="qrc" style="display:inline-block;background:#fff;padding:12px;border-radius:4px"></div><p class="d">${fr?'Scannez ce code avec l\'appareil photo de votre téléphone.':'Scan this code with your phone camera.'}</p><p class="d" style="word-break:break-all">${APP}</p><button class="zb" id="cx">${T_('cls')}</button></div>`;
+ c.style.display='flex';c.onclick=e=>{if(e.target===c||e.target.id==='cx')c.style.display='none'};
+ if(window.QRCode)new QRCode($('qrc'),{text:APP,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});else $('qrc').textContent='QR indisponible'};
+$('qb').onclick=()=>{const c=$('cart'),fr=lang=='fr',h=/^https?:/.test(location.href)&&!/claude/.test(location.host)?location.href.split('#')[0]:'';
+c.innerHTML=`<div style="text-align:center"><h2>${fr?'Ouvrir sur téléphone':'Open on your phone'}</h2><div id="qrc" style="display:inline-block;background:#fff;padding:12px;border-radius:4px"></div><input id="qu" placeholder="https://…" value="${h}" style="width:100%;margin:10px 0 4px;padding:8px;border:1px solid var(--ln);border-radius:4px;background:var(--bg);color:var(--ink);font-size:14px"><p class="d">${fr?'Ce lien Claude est privé. Hébergez le fichier (Netlify, GitHub Pages…) puis collez ici son adresse publique.':'This Claude link is private. Host the file (Netlify, GitHub Pages…) then paste its public address here.'}</p><button class="zb" id="cx">${T_('cls')}</button></div>`;
+const g=u=>{$('qrc').innerHTML='';if(window.QRCode&&u)new QRCode($('qrc'),{text:u,width:220,height:220,correctLevel:QRCode.CorrectLevel.M})};g(h);$('qu').oninput=e=>g(e.target.value.trim()||h);
+c.style.display='flex';c.onclick=e=>{if(e.target===c||e.target.id==='cx')c.style.display='none'}};
+// ===== v4 : accueil, décors sobres, inspection réaliste =====
+let gh=0,insL,lbA=[],nz;
+const MT={moteur:[.8,.35],convert:[.6,.4],transfo:[.6,.45],roue:[.9,.3],essieu:[.9,.3],bogie:[.7,.45],susp:[.8,.3],frein:[.8,.4],rail:[.9,.35],vis:[.9,.3],attelage:[.8,.4],panto:[.6,.4],catenaire:[.9,.3],clim:[.6,.4],porte:[.5,.4],siege:[0,.9],vitre:[0,.1],pare:[0,.1],phare:[0,.1]};
+function noise(){if(nz)return nz;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),d=g.createImageData(128,128);for(let i=0;i<d.data.length;i+=4){const v=120+Math.random()*100|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}g.putImageData(d,0,0);nz=new THREE.CanvasTexture(c);nz.wrapS=nz.wrapT=THREE.RepeatWrapping;nz.repeat.set(3,3);return nz}
+function facade(){const c=document.createElement('canvas');c.width=64;c.height=128;const g=c.getContext('2d');g.fillStyle='#e6e1d8';g.fillRect(0,0,64,128);g.fillStyle='#46586c';for(let y=8;y<120;y+=22)for(let x=8;x<60;x+=28)g.fillRect(x,y,16,12);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t}
+function buildEnv(){envs.forEach(m=>sc.remove(m));envs.length=0;
+ const E=(g,c,x,y,z,o)=>{const m=new THREE.Mesh(g,o||new THREE.MeshLambertMaterial({color:c}));m.position.set(x,y,z);sc.add(m);envs.push(m);return m},P=(w,h)=>new THREE.PlaneGeometry(w,h),X=(d,f)=>{for(let x=-90;x<=90;x+=d)f(x)},fl=c=>{E(P(500,500),c,0,-.08,0).rotation.x=-Math.PI/2};
+ if(type=='metro'){sc.fog=new THREE.Fog(0x161d28,14,75);fl(0x2b323b);
+  const wl=new THREE.MeshLambertMaterial({color:0xdde4ea});
+  E(P(240,5.5),0,0,2.75,-4.2,wl);E(P(240,5.5),0,0,2.75,4.2,wl).rotation.y=Math.PI;E(P(240,8.4),0,0,5.5,0,new THREE.MeshLambertMaterial({color:0x8e98a4})).rotation.x=Math.PI/2;
+  E(B(240,.9,2.2),0xaeb6bf,0,.45,-3.1);E(B(240,.02,.18),0xf2c200,0,.91,-2.1);
+  X(5,x=>E(B(1.6,.08,.3),0,x,5.4,0,new THREE.MeshBasicMaterial({color:0xffffff})));X(10,x=>E(B(.4,5.5,.4),0xc9d0d6,x,2.75,-2.6))}
+ else if(type=='tram'){sc.fog=new THREE.Fog(0xdfe6ec,50,190);fl(0x3b4046);const f=facade();f.repeat.set(4,3);const bm=new THREE.MeshLambertMaterial({map:f});
+  for(const z of[-7.5,7.5])E(B(240,.2,3),0xb9bdc2,0,.1,z);
+  X(18,x=>{for(const z of[-1,1]){const h=11+((x/18+9)*7%4)*3;E(B(15,h,9),0,x,h/2,z*16,bm)}});
+  X(14,x=>{for(const z of[-1,1]){E(Cy(.15,2.4,6),0x5b4636,x,1.2,z*7.5);E(new THREE.SphereGeometry(1.3,8,6),0x6c8f5a,x,3.4,z*7.5)}})}
+ else{sc.fog=new THREE.Fog(0xd4dde6,70,230);fl(0xc3c9ce);
+  E(B(70,.9,3.2),0xb4bac0,0,.45,-5.2);E(B(70,.02,.2),0xf2c200,0,.91,-3.7);E(B(70,.15,4.2),0xf4f6f8,0,4.4,-5.6);X(10,x=>{if(Math.abs(x)<40)E(B(.25,3.4,.25),0x8a939c,x,2.6,-6.6)});
+  const f=facade();f.repeat.set(30,1);E(B(240,12,6),0,0,6,-26,new THREE.MeshLambertMaterial({map:f}))}}
+function inspect(k,o){
+ if(!insp){insp=1;saved={th:G.th,ph:G.ph,rad:G.rad,t:G.t.clone(),ar:$('ar').checked,fog:sc.fog};all.forEach(m=>m.visible=false);envs.forEach(m=>m.visible=false);sc.fog=null;$('cv').style.background='radial-gradient(#0b1a33,#000 70%)';$('ar').checked=true;if(!stars)mkStars();stars.visible=true;$('tip').style.display='none';
+  insL=new THREE.Group();[[0xffffff,1.3,6,6,6],[0x7fb8ff,1,-6,2,-6],[0xffd9a8,.8,0,-6,5]].forEach(l=>{const p=new THREE.PointLight(l[0],l[1],0);p.position.set(l[2],l[3],l[4]);insL.add(p)});sc.add(insL);
+  if(!$('lbs')){const e=document.createElement('div');e.id='lbs';$('cv').appendChild(e)}$('lbs').style.display='block'}
+ if(insG)sc.remove(insG);insG=new THREE.Group();const grp=new THREE.Group(),r=({panto:3,siege:.6})[k]||1,nx=['vis','rail','catenaire','siege','vitre','barre','led','ecran','capteur','marchepied','antenne'];
+ picks.filter(m=>m.position.distanceTo(o.position)<(gh?2.4:r)&&(m.userData.k===k||(gh&&!nx.includes(m.userData.k)))).forEach(m=>{
+  const mk_=m.userData.k,p=m.geometry.parameters,g=p&&p.width>12?B(5,p.height,p.depth):m.geometry,own=mk_===k,mt=MT[mk_]||[.5,.5];
+  const c=new THREE.Mesh(g,own?new THREE.MeshStandardMaterial({color:m.material.color.clone().lerp(new THREE.Color(0xffffff),.35),metalness:mt[0]*.6,roughness:mt[1],bumpMap:noise(),bumpScale:1.5,transparent:!mt[0]&&mt[1]<.2,opacity:.6}):new THREE.MeshBasicMaterial({color:0x5fb0ff,transparent:true,opacity:.1,depthWrite:false}));
+  c.position.copy(m.position);c.rotation.copy(m.rotation);
+  if(!own)c.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,15),new THREE.LineBasicMaterial({color:0x7fd0ff,transparent:true,opacity:.5})));grp.add(c)});
+ const bb=new THREE.Box3().setFromObject(grp),ctr=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());grp.children.forEach(c=>c.position.sub(ctr));
+ insG.add(grp);insG.userData={t:0,s:(gh?5:3.2)/Math.max(sz.x,sz.y,sz.z,.01)};sc.add(insG);G.t.set(0,0,0);G.rad=gh?9:7.5;G.ph=1.2;
+ const hx=sz.x/2,hy=sz.y/2,hz=sz.z/2;lbA=[[.9,.6,.6],[-.9,.2,-.6],[.5,-.8,-.6],[-.7,-.6,.8]].map(a=>new THREE.Vector3(a[0]*hx,a[1]*hy,a[2]*hz));
+ const tx=D[k][3].split(',').slice(0,3).map(t=>'◆ '+t.trim());tx.push('⚖ '+D[k][4]);$('lbs').innerHTML=tx.map(t=>`<div class='lb'>${t}</div>`).join('')}
+function lab(){const w=ren.domElement.clientWidth,h=ren.domElement.clientHeight;[...$('lbs').children].forEach((e,i)=>{const v=insG.localToWorld(lbA[i].clone()).project(cam),x=(v.x+1)/2*w;e.style.left=x+'px';e.style.top=(1-v.y)/2*h+'px';e.classList.toggle('l',x<w/2)})}
+function exitInspect(){if(!insp)return;insp=0;gh=0;sc.remove(insG,insL);stars.visible=false;all.forEach(m=>m.visible=true);envs.forEach(m=>m.visible=true);sc.fog=saved.fog;$('cv').style.background='';$('lbs').style.display='none';$('ar').checked=saved.ar;G.th=saved.th;G.ph=saved.ph;G.rad=saved.rad;G.t.copy(saved.t);sel=null;refresh();panel(null)}
+function setType(t){if(insp)exitInspect();type=t;all.forEach(m=>sc.remove(m));all=[];picks=[];shell=[];edges=[];mats={};build();buildEnv();setOp(+$('op').value);setEx($('ex').value/100);sel=null;lastO=null;panel(null);renderList();Object.assign(G,R);G.t.set(0,2.4,0)}
+function loop(){requestAnimationFrame(loop);if(!$('app').offsetParent)return;
+ if($('ar').checked)G.th+=.004;const k=.14;C.th+=(G.th-C.th)*k;C.ph+=(G.ph-C.ph)*k;C.rad+=(G.rad-C.rad)*k;C.t.lerp(G.t,k);
+ cam.position.set(C.t.x+C.rad*Math.sin(C.ph)*Math.cos(C.th),C.t.y+C.rad*Math.cos(C.ph),C.t.z+C.rad*Math.sin(C.ph)*Math.sin(C.th));cam.lookAt(C.t);
+ if(insp&&insG){const u=insG.userData;u.t=Math.min(1,u.t+.03);const e=1-Math.pow(1-u.t,3);insG.scale.setScalar(u.s*(.3+.7*e));insG.rotation.y=(1-e)*2.5;cam.updateMatrixWorld();insG.updateMatrixWorld(true);lab()}
+ ren.render(sc,cam)}
+function inspUI(k){const s=$('side'),d=s.querySelector('.d');if(!d)return;const en=lang=='en';
+ const ks=[...new Set(picks.filter(m=>m.position.distanceTo(lastO.position)<2.4).map(m=>m.userData.k))].filter(x=>x!==k&&!['vis','rail','catenaire','barre','led','ecran','capteur'].includes(x));
+ d.insertAdjacentHTML('afterend',`<button class='zb' id='gh' style='background:#0b2a4a'>${gh?(en?'Solid view':'Vue pleine'):(en?'Transparent view (nearby parts)':'Vue transparente (composants voisins)')}</button>${ks.length?`<div class='rel'><small>${en?'See also:':'Voir aussi :'}</small>${ks.map(x=>`<a href='#' class='lk' data-r='${x}'>${nm(x)}</a>`).join('')}</div>`:''}`);
+ $('gh').onclick=()=>{gh=!gh;inspect(k,lastO);panel(k)};
+ s.querySelectorAll('[data-r]').forEach(a=>a.onclick=e=>{e.preventDefault();const x=a.dataset.r,n=picks.filter(m=>m.userData.k===x).sort((p,q)=>p.position.distanceTo(lastO.position)-q.position.distanceTo(lastO.position))[0];select(x,n)})}
+const _pn=panel;panel=function(k){_pn(k);if(insp&&k&&lastO)inspUI(k)};
+const t=(a,b,g)=>`<${g||'span'} data-fr='${a}' data-en='${b}'>${a}</${g||'span'}>`;
+$('login').innerHTML=`<div class='pg'><div class='nav'><b class='logo'>ALSTOM <span>CARE</span></b><a href='#sol'>${t('Solutions','Solutions')}</a><a href='#sup'>Support</a><a href='#ctc'>Contact</a><select class='lgs'></select></div>
+<section class='hero'><svg class='bg' viewBox='0 0 1200 600' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='sk' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#050f26'/><stop offset='.6' stop-color='#123a78'/><stop offset='1' stop-color='#f08a4b'/></linearGradient><linearGradient id='tb' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#f6f8fb'/><stop offset='1' stop-color='#bfcbd9'/></linearGradient></defs><rect width='1200' height='600' fill='url(#sk)'/><circle cx='930' cy='400' r='150' fill='#ffb26b' opacity='.28'/><rect y='480' width='1200' height='120' fill='#0a1424'/><path d='M0 500H1200M0 520H1200' stroke='#7f8ea3' stroke-width='3'/><path d='M0 250H1200' stroke='#9fb8d8' stroke-width='1.5' opacity='.5'/><path d='M60 330H760Q870 334 940 404L962 444Q966 476 944 476H60Z' fill='url(#tb)'/><path d='M60 432H962L966 456Q966 476 944 476H60Z' fill='#0b2a6f'/><path d='M60 420H960V430H60Z' fill='#19b3e6'/><path d='M790 346H862Q914 362 944 408H790Z' fill='#0b1830'/><g fill='#0b1830'><rect x='90' y='360' width='96' height='42' rx='7'/><rect x='215' y='360' width='96' height='42' rx='7'/><rect x='340' y='360' width='96' height='42' rx='7'/><rect x='465' y='360' width='96' height='42' rx='7'/><rect x='590' y='360' width='96' height='42' rx='7'/></g><g fill='#1b222c'><circle cx='170' cy='482' r='22'/><circle cx='250' cy='482' r='22'/><circle cx='760' cy='482' r='22'/><circle cx='840' cy='482' r='22'/></g><circle cx='950' cy='436' r='7' fill='#fff6c8'/></svg>
+<div class='hc'><div class='tx'><h2>${t('La maintenance ferroviaire, en 3D','Rail maintenance, in 3D')}</h2><p>${t('Explorez un métro, un tramway ou un TGV pièce par pièce : fiches techniques, matériaux, prix et pièces détachées.','Explore a metro, tram or high-speed train part by part: datasheets, materials, prices and spare parts.')}</p><ul><li><b>3</b>${t('véhicules','vehicles')}</li><li><b>32</b>${t('pièces détaillées','detailed parts')}</li><li><b>FR · EN</b>${t('2 langues','2 languages')}</li></ul></div>
+<div class='card'><h1 class='logo'>ALSTOM <span>CARE</span></h1><p>Connectez-vous à votre espace maintenance.</p><label for='em'>Email</label><input id='em' type='email' placeholder='prenom.nom@alstom.com'><label for='pw'>Mot de passe</label><input id='pw' type='password' placeholder='••••••••'><button class='go' id='go'>Se connecter</button></div></div></section>
+<section class='sec' id='sol'><h3>${t('Nos solutions','Our solutions')}</h3><div class='gr'><div class='cc'><b>${t('Métro','Metro')}</b>${t('Rames urbaines à forte capacité, pensées pour la fréquence.','High-capacity urban trains built for frequency.')}</div><div class='cc'><b>${t('Tramway','Tram')}</b>${t('Confort et accessibilité au cœur de la ville.','Comfort and accessibility in the heart of the city.')}</div><div class='cc'><b>${t('Grande vitesse','High speed')}</b>${t('Performance et fiabilité sur longue distance.','Performance and reliability over long distances.')}</div></div></section>
+<section class='sec' id='sup'><h3>Support</h3><div class='gr'><div class='cc'><b>${t('Assistance technique','Technical support')}</b>${t('Du lundi au vendredi, 8 h – 18 h','Monday to Friday, 8am – 6pm')}</div><div class='cc'><b>Email</b>support@alstom-care.example</div><div class='cc'><b>${t('Téléphone','Phone')}</b>+33 1 00 00 00 00 ${t('(numéro fictif)','(fictional number)')}</div></div></section>
+<section class='sec' id='ctc'><h3>Contact</h3><div class='ct'><input id='cn' placeholder='Nom / Name'><input id='ce' placeholder='Email'><textarea id='cm' rows='4' placeholder='Message'></textarea><button class='go' id='cs'>${t('Envoyer','Send')}</button></div></section>
+<div class='ft'>${t('Prototype pédagogique, non affilié à Alstom. Données fictives.','Educational prototype, not affiliated with Alstom. Fictional data.')}</div></div>`;
+$('go').onclick=()=>{$('login').style.display='none';$('app').style.display='flex';init()};
+['em','pw'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()}));
+$('cs').onclick=()=>{$('cs').parentNode.innerHTML=`<p>${lang=='en'?'Thank you, we will get back to you shortly.':'Merci, nous revenons vers vous rapidement.'}</p>`};
+document.querySelectorAll('.lgs').forEach(s=>{s.innerHTML="<option value='fr'>Français</option><option value='en'>English</option>";s.onchange=e=>{lang=e.target.value;applyLang()}});
+const _al=applyLang;applyLang=function(){_al();document.querySelectorAll('[data-en]').forEach(e=>e.textContent=lang=='en'?e.dataset.en:e.dataset.fr)};applyLang();
+// ===== v5 : mobile portrait/paysage =====
+$('pl').onclick=()=>$('list').classList.toggle('o');
+$('list').addEventListener('click',()=>$('list').classList.remove('o'));
+const toast=m=>{let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.style.cssText='position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:#0b2a4a;color:#fff;padding:10px 14px;border-radius:6px;font-size:13px;z-index:20;max-width:90%;text-align:center';document.body.appendChild(e)}e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',5000)};
+const ob=document.createElement('button');ob.id='ob';$('tools').appendChild(ob);
+ob.onclick=async()=>{try{if(document.fullscreenElement){await document.exitFullscreen();screen.orientation.unlock();return}await document.documentElement.requestFullscreen();await screen.orientation.lock('landscape')}catch(e){toast(lang=='en'?'Auto-lock unavailable here: rotate your phone and turn off rotation lock.':'Verrouillage automatique indisponible ici : tournez votre téléphone et désactivez le verrouillage de rotation.')}};
+const _p2=panel;panel=function(k){_p2(k);$('side').classList.toggle('mn',!k)};
+const _a2=applyLang;applyLang=function(){_a2();ob.textContent=lang=='en'?'↻ Landscape':'↻ Paysage'};applyLang();
+// ===== v6 : 13 composants en plus =====
+Object.assign(D,{
+ecran:['Écran d’information voyageurs','Information','500 € – 2 000 €','Dalle LCD/LED, boîtier aluminium, vitre anti-reflet','3 – 8 kg','6 à 10 par voiture','8 à 10 ans','Nettoyage mensuel, mise à jour logicielle annuelle','Affiche les prochains arrêts, les correspondances et les messages de service.'],
+barre:['Barre de maintien','Confort','80 € – 300 € le mètre','Inox ou aluminium anodisé, revêtement antibactérien','1 – 3 kg le mètre','≈ 40 m par voiture','20 à 30 ans','Nettoyage quotidien, fixations contrôlées tous les 6 mois','Permet aux voyageurs debout de se tenir pendant les accélérations et les freinages.'],
+led:['Éclairage LED intérieur','Confort','150 € – 600 € le mètre','Modules LED, diffuseur polycarbonate, alimentation 24/72 V','0,5 – 1,5 kg le mètre','≈ 20 m par voiture','10 à 15 ans (≈ 60 000 h)','Contrôle visuel mensuel, modules défaillants remplacés','Éclairage économe et uniforme, avec mode secours sur batterie.'],
+essuie:['Essuie-glace','Sécurité','1 500 € – 4 000 €','Bras en inox, balai caoutchouc, moteur électrique','8 – 15 kg','2 par cabine','10 à 15 ans (balai : 1 an)','Balais changés chaque année, test mensuel','Maintient la visibilité du conducteur sous la pluie et la neige.'],
+klaxon:['Avertisseur sonore','Sécurité','600 € – 2 500 €','Membrane aluminium, résonateur acier, boîtier inox','3 – 8 kg','2 par cabine','15 à 20 ans','Test sonore à chaque prise de service','Signale le train aux personnes sur la voie et aux passages à niveau.',['Niveau sonore','≈ 110 dB à 5 m']],
+antenne:['Antenne GSM-R / GPS','Information','1 000 € – 5 000 €','Boîtier polymère, éléments en cuivre, connecteurs inox','1 – 4 kg','2 à 4 par rame','15 ans','Contrôle visuel annuel, test de réception à chaque révision','Assure la liaison radio sol-train et la géolocalisation.'],
+disj:['Disjoncteur principal','Énergie','30 000 € – 90 000 €','Enceinte acier, contacts cuivre argenté, isolant céramique','150 – 400 kg','1 par rame','25 à 30 ans','Test de déclenchement annuel, révision tous les 3 à 5 ans','Coupe l’alimentation haute tension en cas de défaut ou sur commande.',['Tension','25 kV AC ou 1,5 kV DC']],
+compresseur:['Compresseur d’air','Freinage','10 000 € – 30 000 €','Fonte, aluminium, moteur électrique, filtres','200 – 350 kg','1 à 2 par rame','20 ans','Huile et filtres changés tous les 6 à 12 mois','Produit l’air comprimé pour les freins, les portes et la suspension pneumatique.'],
+reservoir:['Réservoir d’air principal','Freinage','2 000 € – 6 000 €','Acier soudé, traitement anticorrosion','80 – 200 kg','1 à 2 par voiture','30 ans','Purge quotidienne, requalification périodique réglementaire','Stocke l’air comprimé nécessaire au freinage et aux équipements pneumatiques.'],
+pupitre:['Pupitre de conduite','Pilotage','20 000 € – 60 000 €','Structure aluminium, écrans, commandes inox, électronique embarquée','80 – 200 kg','1 par cabine','20 à 25 ans','Essais à chaque prise de service, mises à jour logicielles','Regroupe les commandes de traction et de freinage, les écrans et la veille automatique.'],
+soufflet:['Soufflet d’intercirculation','Structure','8 000 € – 25 000 €','Toile caoutchoutée ignifugée, cadre aluminium','150 – 400 kg','1 par jonction','15 à 20 ans','Inspection visuelle mensuelle, remplacé si déchirure','Assure un passage sûr, étanche et silencieux entre deux voitures.'],
+marchepied:['Marchepied','Accès','1 500 € – 6 000 €','Aluminium antidérapant, vérin électrique ou pneumatique','20 – 60 kg','4 par voiture','20 à 30 ans','Contrôle trimestriel, nettoyage et graissage','Comble l’espace entre le quai et le train, notamment pour les fauteuils roulants.'],
+capteur:['Capteur de vitesse','Pilotage','300 € – 1 200 €','Boîtier inox, aimant, câble blindé','0,5 – 1,5 kg','1 par essieu','10 à 15 ans','Contrôle du signal tous les 6 mois','Mesure la rotation de l’essieu pour la vitesse, l’antipatinage et l’antienrayage.']});
+Object.assign(EN,{ecran:['Passenger information display','Shows next stops, connections and service messages.'],barre:['Handrail','Lets standing passengers hold on during acceleration and braking.'],led:['Interior LED lighting','Efficient, even lighting with battery backup mode.'],essuie:['Windscreen wiper','Keeps the driver’s view clear in rain and snow.'],klaxon:['Horn','Warns people on the track and at level crossings.'],antenne:['GSM-R / GPS antenna','Provides the train-to-ground radio link and geolocation.'],disj:['Main circuit breaker','Cuts the high-voltage supply on fault or on command.'],compresseur:['Air compressor','Produces compressed air for brakes, doors and air suspension.'],reservoir:['Main air reservoir','Stores compressed air for braking and pneumatic equipment.'],pupitre:['Driver’s desk','Groups traction and braking controls, screens and the vigilance system.'],soufflet:['Gangway bellows','Provides a safe, sealed and quiet passage between cars.'],marchepied:['Retractable step','Bridges the platform gap for easier access, including wheelchairs.'],capteur:['Speed sensor','Measures axle rotation for speed, wheel-slip and anti-lock control.']});
+Object.assign(CN,{'Information':'Passenger info','Pilotage':'Control'});XL['Niveau sonore']='Sound level';
+Object.assign(SM,{ecran:[500,2000],barre:[80,300],led:[150,600],essuie:[1500,4000],klaxon:[600,2500],antenne:[1000,5000],capteur:[300,1200]});
+Object.assign(MT,{ecran:[.3,.25],barre:[.9,.25],led:[0,.5],essuie:[.5,.5],klaxon:[.8,.3],antenne:[.3,.6],disj:[.6,.4],compresseur:[.8,.4],reservoir:[.8,.35],pupitre:[.4,.4],soufflet:[0,.95],marchepied:[.8,.5],capteur:[.7,.4]});
+const _b=build;build=function(){_b();const T=TY[type],L=T.L,W=T.W,s=L/16,Y0=1.35,H=2.5,PX=-1.6*s,xd=[-5.2*s,3.2*s],n=T.n;
+ for(const t of[-1,1]){
+  xd.forEach(x=>{mk('ecran',B(.5,.18,.05),0x111820,x,Y0+2.2,t*(W/2-.2));mk('marchepied',B(1.2,.06,.35),0x9aa4ae,x,Y0+.05,t*(W/2+.18));
+   for(const d of[-.85,.85])mk('barre',Cy(.03,2.2,8),0xc9d0d6,x+d,Y0+1.2,t*(W/2-.15))});
+  mk('barre',B(L-3,.05,.05),0xc9d0d6,0,Y0+2.15,t*.5);mk('led',B(L-2,.04,.12),0xfff4cf,0,Y0+H-.12,t*.35);
+  mk('reservoir',Cy(.22,2.2,16),0x7a838c,-1.8*s,1.05,t*1.1).rotation.z=Math.PI/2}
+ const a=n[2],b=n[3],px=L/2+a[0]+(b[0]-a[0])*.25+.2,py=Y0+a[1]+(b[1]-a[1])*.25+.2,ang=Math.atan2(b[1]-a[1],b[0]-a[0]);
+ for(const z of[-.45,.45])mk('essuie',B(.05,.04,.8),0x222222,px,py,z,0,ang);
+ mk('klaxon',Cy(.14,.25,12),0x666d75,L/2+Math.min(.4,n[3][0]*.5),Y0+H+.14,.6,0,Math.PI/2);
+ mk('antenne',Cy(.04,.4,8),0x222222,-L/2+1.2,Y0+H+.2,.5);mk('antenne',B(.3,.08,.2),0x555555,-L/2+1.2,Y0+H+.04,.5);
+ if(T.el){mk('disj',B(1.1,.5,.7),0x7f8892,PX+1.9*s,Y0+H+.25,0);mk('disj',Cy(.1,.35,10),0xc9a46a,PX+1.9*s,Y0+H+.65,0)}
+ mk('compresseur',B(.8,.5,.8),0x6f7a85,2.75*s,1.1,.35);
+ mk('pupitre',B(.5,.35,1.4),0x2b3440,L/2+.45,Y0+.55,0);mk('pupitre',B(.05,.3,.6),0x0f1620,L/2+.62,Y0+.9,0);
+ mk('soufflet',B(.4,2.2,2.3),0x20252b,-L/2-.2,Y0+1.2,0);
+ for(const bx of[-5.5*s,5*s])for(const ax of[-1.2,1.2])mk('capteur',B(.12,.12,.15),0x3a4a5a,bx+ax,.8,.86)};
+if(ready){setType(type)}
+// ===== v7 : navigation, retour, visite guidée, rendu =====
+let flt=null,hp=0,tour=0,tt,fxd=0;
+const ICO={Traction:'⚡','Énergie':'🔌',Roulement:'⚙️',Freinage:'🛑',Voie:'🛤️',Structure:'🔩','Accès':'🚪',Confort:'💺','Sécurité':'🛡️',Information:'📟',Pilotage:'🎛️'},CC={Traction:'#e67e22','Énergie':'#f1c40f',Roulement:'#7f8c8d',Freinage:'#e74c3c',Voie:'#95a5a6',Structure:'#34495e','Accès':'#3498db',Confort:'#9b59b6','Sécurité':'#2ecc71',Information:'#1abc9c',Pilotage:'#e84393'};
+const cvE=$('cv'),mkE=(tag,id,html,par)=>{const e=document.createElement(tag);e.id=id;e.innerHTML=html;(par||cvE).appendChild(e);return e};
+mkE('div','sb','<input id=si type=search autocomplete=off><div id=sg></div>');mkE('div','fb','');
+mkE('div','ib','<button id=ibk>← Train</button><button class=sq id=ipv>‹</button><button class=sq id=inx>›</button><span class=bc id=ibc></span>');mkE('div','tc','');
+mkE('div','ld','<b class=logo>ALSTOM <span>CARE</span></b><i></i>',document.body);
+$('ib').style.pointerEvents='none';[...$('ib').children].forEach(c=>c.style.pointerEvents='auto');
+const pres=()=>Object.keys(D).filter(k=>picks.some(m=>m.userData.k===k)),ord=()=>{const ks=pres();return [...new Set(ks.map(ct))].flatMap(c=>ks.filter(k=>ct(k)===c))};
+const near=(k,ref)=>picks.filter(m=>m.userData.k===k).sort((a,b)=>a.position.distanceTo(ref)-b.position.distanceTo(ref))[0];
+function fbR(){const en=lang=='en',cs=[...new Set(pres().map(k=>D[k][1]))];
+ $('fb').innerHTML='<button data-t=1>▶ '+(en?'Guided tour':'Visite guidée')+'</button><button data-c=0 class='+(flt?'x':'on')+'>'+(en?'All':'Tout')+'</button>'+cs.map(c=>`<button data-c=${c} class=${flt==c?'on':'x'}><i style=background:${CC[c]}></i>${en?CN[c]:c}</button>`).join('')}
+$('fb').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t){startTour();return}flt=b.dataset.c=='0'?null:b.dataset.c;applyFlt();fbR()};
+function applyFlt(){for(const id in mats){const m=mats[id],k=m.userData.k;if(!k)continue;if(!m.userData.t0)m.userData.t0=[m.transparent,m.opacity];const on=!flt||D[k][1]==flt;m.transparent=on?m.userData.t0[0]:true;m.opacity=on?m.userData.t0[1]:.08;m.depthWrite=on;m.needsUpdate=true}setOp(flt?14:100)}
+const si=$('si');
+function sgR(){const q=si.value.trim().toLowerCase(),g=$('sg');if(!q){g.style.display='none';return}
+ const r=pres().filter(k=>(nm(k)+' '+ct(k)+' '+D[k][3]).toLowerCase().includes(q)).slice(0,6);
+ g.innerHTML=r.map(k=>`<button data-k=${k}>${ICO[D[k][1]]} ${nm(k)} <small style=opacity:.6>· ${ct(k)}</small></button>`).join('')||`<button disabled>${lang=='en'?'No result':'Aucun résultat'}</button>`;g.style.display='block'}
+si.oninput=sgR;si.onkeydown=e=>{if(e.key==='Enter'){const b=$('sg').querySelector('[data-k]');if(b)b.click()}};
+$('sg').onclick=e=>{const b=e.target.closest('[data-k]');if(b){stopTour();go(b.dataset.k);si.value='';sgR();si.blur()}};
+$('list').addEventListener('click',()=>stopTour());
+function ibR(){const k=sel;if(!k)return;$('ibc').innerHTML=`<a href=# id=bt style=color:#7fd0ff>Train</a> › ${lang=='en'?CN[D[k][1]]:D[k][1]} › <b>${nm(k)}</b>`;$('bt').onclick=e=>{e.preventDefault();exitInspect()}}
+$('ibk').onclick=()=>exitInspect();
+const step=d=>{const o=ord(),i=o.indexOf(sel),k=o[(i+d+o.length)%o.length];if(k)select(k,near(k,lastO.position))};
+$('ipv').onclick=()=>{stopTour();step(-1)};$('inx').onclick=()=>{stopTour();step(1)};
+const _in=inspect;inspect=function(k,o){const f=!insp;_in(k,o);$('ib').style.display='flex';$('sb').style.display=$('fb').style.display='none';ibR();if(f&&!hp){try{history.pushState({i:1},'');hp=1}catch(e){}}};
+const _ex=exitInspect;exitInspect=function(){const was=insp;_ex();$('ib').style.display='none';$('sb').style.display=$('fb').style.display='';if(was)stopTour();if(hp){hp=0;try{history.back()}catch(e){}}};
+addEventListener('popstate',()=>{hp=0;exitInspect()});
+function stopTour(){clearTimeout(tt);if(tour){tour=0;$('tc').style.display='none'}}
+function tourGo(i,L){if(!tour)return;if(i>=L.length){stopTour();exitInspect();return}const k=L[i];gh=(k=='moteur'||k=='bogie')?1:0;select(k,near(k,insp&&lastO?lastO.position:cam.position));
+ $('tc').innerHTML=`<b>${i+1}/${L.length} · ${nm(k)}</b><br>${ds(k)}<br><button id=ts>${lang=='en'?'Stop tour':'Arrêter la visite'}</button>`;$('tc').style.display='block';$('ts').onclick=()=>stopTour();tt=setTimeout(()=>tourGo(i+1,L),8500)}
+function startTour(){if(insp)exitInspect();const L=['pare','porte','siege','panto','clim','moteur','roue','bogie'].filter(k=>picks.some(m=>m.userData.k===k)).slice(0,7);tour=1;tourGo(0,L)}
+const _p3=panel;panel=function(k){_p3(k);if(!k)return;const s=$('side'),p=D[k],tg=s.querySelector('.tag');if(tg)tg.textContent=ICO[p[1]]+' '+tg.textContent;
+ const v=p[2].replace(/[^0-9M€]/g,'').split('€').filter(x=>x).map(x=>parseFloat(x)*(x.includes('M')?1e6:1)),pr=s.querySelector('.price');
+ if(pr&&v.length){const lo=Math.log10(Math.max(1,v[0]))/6.5*100,hi=Math.log10(Math.max(1,v[v.length-1]))/6.5*100;pr.insertAdjacentHTML('afterend',`<div class=gg><i style=left:${lo}%;width:${Math.max(3,hi-lo)}%></i></div><div class=gl><span>1 €</span><span>1 000 €</span><span>1 M€</span></div>`)}
+ const dd=s.querySelector('dd');if(dd)dd.innerHTML=p[3].split(',').map(x=>`<span class=ch>${x.trim()}</span>`).join('')};
+function shade(){all.forEach(m=>{m.castShadow=true;m.receiveShadow=m.position.y<.3});envs.forEach(m=>m.receiveShadow=true)}
+function fx(){if(fxd)return;fxd=1;try{
+ ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.1;
+ const f=[];for(let i=0;i<6;i++){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,0,128);
+  if(i==2){gr.addColorStop(0,'#cfe6ff');gr.addColorStop(1,'#cfe6ff')}else if(i==3){gr.addColorStop(0,'#59606a');gr.addColorStop(1,'#59606a')}else{gr.addColorStop(0,'#8fb8e6');gr.addColorStop(.5,'#e9eef3');gr.addColorStop(1,'#6b7480')}
+  g.fillStyle=gr;g.fillRect(0,0,128,128);f.push(c)}
+ const ct2=new THREE.CubeTexture(f);ct2.needsUpdate=true;ct2.generateMipmaps=true;ct2.minFilter=THREE.LinearMipmapLinearFilter;sc.environment=ct2;
+ sc.traverse(o=>{if(o.isHemisphereLight)o.intensity=.6;if(o.isDirectionalLight){o.color.set(0xfff0dc);o.intensity=1;if(innerWidth>=900){o.castShadow=true;o.shadow.mapSize.set(2048,2048);const c=o.shadow.camera;c.left=c.bottom=-30;c.right=c.top=30;c.far=80}}});
+ if(innerWidth>=900){ren.shadowMap.enabled=true;ren.shadowMap.type=THREE.PCFSoftShadowMap;shade()}}catch(e){}}
+const _b2=build;build=function(){_b2();if(ren&&ren.shadowMap.enabled)shade()};
+const _st=setType;setType=function(t){_st(t);flt=null;fbR();if(ren.shadowMap.enabled)shade()};
+$('go').onclick=()=>{$('login').style.display='none';$('app').style.display='flex';const l=$('ld');l.style.display='flex';l.style.opacity=1;setTimeout(()=>{init();fx();fbR();setTimeout(()=>{l.style.opacity=0;setTimeout(()=>l.style.display='none',500)},500)},60)};
+$('qb').insertAdjacentHTML('beforebegin','<button id=th aria-label=Theme>◐</button>');
+$('th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'};
+const _a3=applyLang;applyLang=function(){_a3();const en=lang=='en';si.placeholder='🔍 '+(en?'Search a part…':'Rechercher une pièce…');if(ready){fbR();sgR();if(insp)ibR()}};applyLang();
+</script></body></html>
